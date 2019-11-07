@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>DetailEdit.qml</file>
+        <file>MainWidget.qml</file>
+    </qresource>
+</RCC>
