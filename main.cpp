@@ -19,13 +19,14 @@ int main(int argc, char *argv[])
     ConfigManager::getInstance().loadConfig();
 
     //初始化model
-    ConfigManager::getInstance().foreachServer(std::bind(&ServerListModel::insertData,&ServerListModel::getInstance(),std::placeholders::_1));
+    ConfigManager::getInstance().foreachServer(std::bind(&ServerListModel::insertData,&ServerListModel::getInstance(),std::placeholders::_1,false));
 
     //注册model
     qmlRegisterSingletonType<ServerListModel>("ServerWatcher.Model",1,0,"ServerListModel",[](QQmlEngine* ,QJSEngine *)->QObject*{
         return & ServerListModel::getInstance();
     });
 
+    qmlRegisterType<ProcessAgentInfo>("ServerWatcher.Agent",1,0,"ProcessAgentInfo");
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

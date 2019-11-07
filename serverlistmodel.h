@@ -24,14 +24,13 @@ public:
     };
 
     Q_ENUM(Roles)
-
-    //用户操作类型
-    enum UserOperate{
-        Run,            //运行
-        Termination     //终止
-    };
-
     //explicit ServerListModel(QObject *parent = nullptr);
+
+
+    static ServerListModel& getInstance(){
+        static ServerListModel instance;
+        return instance;
+    }
 
     Q_INVOKABLE virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Q_INVOKABLE virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -39,16 +38,15 @@ public:
     Q_INVOKABLE virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole)override;
     virtual QHash<int,QByteArray> roleNames() const override;
 
-    //新增  indertData 没有重载，如果有
-    Q_INVOKABLE void insertData(const ProcessAgentInfo &processInfo);
+    /* 自定义 方法*/
+    //新增  indertData 没有重载，如果有 ，syn表示是否需要同步到持久化文件中
+    Q_INVOKABLE void insertData(const ProcessAgentInfo &processInfo,bool syn = false);
 
-    //处理用户操作
-    Q_INVOKABLE void DealUserOperation(const QModelIndex &index, const UserOperate& type);
+    Q_INVOKABLE void run(int row);
+    Q_INVOKABLE void stop(int row);
+    Q_INVOKABLE void modifyData(int row,const ProcessAgentInfo& agentInfo);
+    Q_INVOKABLE void deleteData(int row);
 
-    static ServerListModel& getInstance(){
-        static ServerListModel instance;
-        return instance;
-    }
 signals:
 
 public slots:

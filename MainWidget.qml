@@ -1,11 +1,16 @@
 import QtQuick 2.4
-import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Controls 2.5
 import ServerWatcher.Model 1.0
+import ServerWatcher.Agent 1.0
 
 Item {
     id: element
+
+    DetailEdit{
+        id:editer
+    }
+
     Rectangle {
         id: background
         color: "#7c8489"
@@ -34,10 +39,19 @@ Item {
                 height: 40
                 width: parent.width
                 color: model.state === 2 ? "#5579ed" : "red"
+                Row{
+                    Text {
+                        id: name
+                        text: qsTr(model.alias)
+                    }
 
-                Text {
-                    id: name
-                    text: qsTr(model.alias)
+                    Button{
+                        text: "编辑"
+                        property ProcessAgentInfo info
+                        onClicked: {
+                            editer.show(info)
+                        }
+                    }
                 }
             }
         }

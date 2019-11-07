@@ -36,9 +36,16 @@ public:
         data.clear();
     }
 
+    bool isValidRow(const int& row)const{
+        return row >= 0 && row < data.size();
+    }
     //找到对象所在的行
     int findRow(QObject* process){
         return  data.indexOf(dynamic_cast<ProcessAgent*>(process));
+    }
+
+    void remove(int index){
+        data.remove(index);
     }
 private:
     ServerListModel * const q_ptr;
@@ -145,7 +152,7 @@ bool ServerListModel::setData(const QModelIndex &index, const QVariant &value, i
     return ret;
 }
 
-void ServerListModel::insertData(const ProcessAgentInfo& processInfo)
+void ServerListModel::insertData(const ProcessAgentInfo& processInfo,bool syn)
 {
     qDebug()<<"insert: "<<processInfo.getAlias();
     Q_D(ServerListModel);
@@ -156,6 +163,47 @@ void ServerListModel::insertData(const ProcessAgentInfo& processInfo)
     beginInsertRows(QModelIndex(),d->data.size(),d->data.size());
     d->data.push_back(pProcess);
     endInsertRows();
+
+    if(syn){ //TODO 持久化 同步
+
+    }
+}
+
+void ServerListModel::run(int row)
+{
+    Q_D(ServerListModel);
+    if(d->isValidRow(row)){
+        d->data[row]->start();
+    }
+}
+
+void ServerListModel::stop(int row)
+{
+    Q_D(ServerListModel);
+    if(d->isValidRow(row)){
+        d->data[row]->stop();
+    }
+}
+
+void ServerListModel::modifyData(int row, const ProcessAgentInfo &agentInfo)
+{
+    Q_D(ServerListModel);
+    if(d->isValidRow(row)){
+        d->data[row]->setBaseInfo(agentInfo);
+        emit dataChanged(index(row),index(row));
+
+        //TODO 同步到配置文件中
+    }
+}
+
+void ServerListModel::deleteData(int row)
+{
+    Q_D(ServerListModel);
+    if(d->isValidRow(row)){
+        beginRemoveRows(QModelIndex(),row,row);
+        d->remove(row);
+        endRemoveRows();
+    }
 }
 
 
@@ -164,11 +212,6 @@ QHash<int, QByteArray> ServerListModel::roleNames() const
    const Q_D(ServerListModel);
 
    return d->rolesNames;
-}
-
-void ServerListModel::DealUserOperation(const QModelIndex &index, const UserOperate& type)
-{
-
 }
 
 void ServerListModel::onStateChanged(QProcess::ProcessState newState)
